@@ -1,0 +1,176 @@
+*********************************************
+             Apache Admin tasks
+*********************************************
+
+> We can Do Practice of Apache Admin tasks on Single Node or Multi Node Cluster
+
+> Go in aws secuirty credentials ===> access key credentials create new access key
+
+> Go in terminal 
+$ 1.cd /usr/local/hadoop/etc/hadoop
+  2.ls
+  
+
+-----**** Creating a data pipeline from s3 to hdfs and vice versa ****-----
+
+$ 3.nano core-site.xml ===> make changes watch video
+
+
+<property>
+  <name>fs.s3a.access.key</name>
+  <description>AWS access key ID used by S3A file system.</description>
+  <value>AKIAJ5IOWRHVI24JPJPQ ===> (copy past the access key id </value> 
+</property>
+
+<property>
+  <name>fs.s3a.secret.key</name>
+  <description>AWS secret key used by S3A file system.</description>
+  <value>OjC8QsKDYWE6HD5WNOykgwaSplpNzJUCB57R2ZZM(secreate access key)</value>
+</property>
+
+
+
+$ 4.nano hadoop-env.sh
+
+export HADOOP_CLASSPATH=$HADOOP_CLASSPATH:$HADOOP_HOME/share/hadoop/tools/lib/*
+
+$ 5.cd
+
+$ 6.hadoop fs -cp s3a://<bucket-name>/<file-name> hdfs:///user/hduser/ ====> Check if there is any file avialable or not in aws S3 if not available create it
+
+$ 7.hdfs dfs -cp s3a://<bucket-name>/<file-name> /user/hduser/ ====> hdfs dfs -cp s3a:// ===> S3 buket file name /user/hduser/
+
+$ 8.hdfs dfs -ls /user/hduser ===> check if file is there or not 
+
+
+-----**** Hadoop Archivals ****-----
+$ 1.hdfs dfs -ls /user
+$ 2.hdfs dfs -ls /user/ubuntu
+$ 3.ls
+$ 4.hdfs dfs -put abc /user/ubuntu
+$ 5.hdfs dfs -ls /user/ubuntu
+$ 6.hadoop archive -archiveName xyz.har -p /user/ubuntu abcd hadoop-2.8.2.tar.gz /user/ubuntu ===> sir used ==> hadoop archive -archiveName myarch.har -p /user/ubuntu /user/hduser   
+$ 7.dsh -a jps
+$ 8.hdfs dfs -rm -R /user/hduser
+$ 9.hdfs dfs -ls /user/hduser
+
+$ 10.hdfs dfs -mkdir /user/hduser ====> again run archive command
+$ 11.hdfs dfs -ls /user/hduser
+$ 12.hdfs dfs -ls -R /user/hduser
+
+
+ hdfs dfs -ls -R xyz.har
+
+$ 13.hdfs dfs -ls -R har:///user/ubuntu/xyz.har  ===> sir used this command ==> hdfs dfs -ls -R har:///user/ubuntu/myarch.har
+
+$ 14.hdfs dfs -cp har:///user/ubuntu/myarch.har/abcd hdfs:/user/ubuntu/unarch  ===> sir used this command hdfs dfs -cp har:///user/hduser/myarch.har/abc /user/hduser
+
+$ 15.hdfs dfs -ls /user/hduser                                           hdfs dfs -mkdir /user/ubuntu/unarch
+hdfs dfs -ls -R /user/ubuntu/unarch
+
+
+
+
+-----**** Trash configuration ****-----
+$ 1.cd /user/local/hadoop/etc/hadoop/
+$ 2.nano core-site.xml
+
+<property>
+<name>fs.trash.interval</name>
+<value>30</value>
+<description>Number of minutes between trash checkpoints. If zero, the trash feature is disabled</description>
+</property>
+<property>
+<name>fs.trash.checkpoint.interval</name>
+<value>15</value>
+</property>
+
+$ 3.cd  
+
+$ 4.hdfs dfs -rm /user/hduser/abc
+$ 5.hdfs dfs -rm -skipTrash /user/hduser/myarch.har/part-0
+
+$ 5.hdfs dfs -ls -R <path>
+
+## To permanently delete without going to trash
+ hdfs dfs -rm -skipTrash <path-to-file>
+
+
+>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+$ 6.hadoop version 
+$ 7.hdfs dfs -du hdfs:/
+$ 8.hdfs dfs -count hdfs:/
+$ 9.hdfs dfs -count -h hdfs:/
+hadoop version
+
+hdfs dfs -du hdfs:/  -------------disk usage
+
+hdfs dfs -count hdfs:/ --------- file count
+
+
+-----*** Distributed copy ***-----
+
+> Google search for discp commad 
+
+$ 1.cd /user/local/hadoop/etc/hadoop/
+
+$ 2.nano core-site.xml  ===> watch vido also
+
+<property>
+  <name>fs.s3a.access.key</name>
+  <description>AWS access key ID used by S3A file system.</description>
+  <value>AKIAQH2AR57J6Y2MBN6I</value> 
+</property>
+
+<property>
+  <name>fs.s3a.secret.key</name>
+  <description>AWS secret key used by S3A file system.</description>
+  <value>OsjmqGmq/OhAg6tfHuTBVkfI5pbn6cG6poqf8vzB</value>
+</property>
+
+<property>
+<name>fs.s3.impl</name>
+<value>org.apache.hadoop.fs.s3.S3FileSystem</value>
+<description>The FileSystem for s3a: S3 uris.</description>
+</property>
+
+
+
+$ 3.nano mapred-site.xml
+
+<property>
+  <!-- Add to the classpath used when running an M/R job -->
+  <name>mapreduce.application.classpath</name>
+  <value>$HADOOP_MAPRED_HOME/share/hadoop/mapreduce/*,$HADOOP_MAPRED_HOME/share/hadoop/mapreduce/lib/*,$HADOOP_MAPRED_HOME/share/hadoop/tools/lib/*</value>
+</property>
+
+
+$ 4.nano hadoop-env.sh
+
+export HADOOP_CLASSPATH=$HADOOP_CLASSPATH:$HADOOP_HOME/share/hadoop/tools/lib/*
+
+$ 5.hdfs dfs -ls /user/hduser
+
+$ 6.hadoop distcp /user/hduser/jinga.xml s3a://<bucket-name>/
+
+$ 7.hadoop distcp hdfs:///user/hduser/jinga.xml s3a://<bucket-name>/
+
+
+-----**** Changing the block size ****-----
+Default block sizes is 128 MB   
+$ 1.cd /user/local/hadoop/
+$ 2.nano hdfs-site.xml
+
+<property>
+<name>dfs.block.size</name>
+<value>256m</value> 
+</property>
+$ 3.cd
+$ 4.nano abc ===> for checking the change has come into effects or not  
+$ 5.hdfs dfs -put abc /user/hduser
+
+> Go in aws console select the instance name NN ===> copy public ip and past in search bar :9870
+
+----**** Setting Replication for a dataset ----*****
+
+$ 6.hdfs dfs -setrep -w 4 /user/hduser/abc
